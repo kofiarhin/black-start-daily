@@ -1,0 +1,25 @@
+{
+  "name": "balck-star-daily",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "crawler": "node server/main.js",
+    "server": "node server/server.js",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crawlee": "^3.15.3",
+    "express": "^5.2.1",
+    "playwright": "^1.57.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
