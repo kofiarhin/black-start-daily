@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
 const connectDB = require("./config/db");
+const News = require("./models/news.model");
 
 const app = express();
 connectDB();
@@ -19,7 +20,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/news", async (req, res, next) => {
-  return res.json(newsData);
+  const news = await News.find();
+  return res.json(news);
 });
 
 app.get("/api/health", (req, res) => {

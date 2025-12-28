@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import NewsList from "./components/NewsList/NewsList";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
+import Spinner from "./components/Spinner/Spinner";
 
 const App = () => {
   const getNews = async () => {
@@ -18,10 +19,14 @@ const App = () => {
       console.log(error.message);
     }
   };
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["news"],
     queryFn: getNews,
   });
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div>

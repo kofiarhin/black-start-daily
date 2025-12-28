@@ -12,12 +12,10 @@ const newsSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      set: (v) => v?.replace(/\s+/g, " ").trim(),
     },
     text: {
       type: String,
       required: true,
-      set: (v) => v?.replace(/\s+/g, " ").trim(),
     },
     image: {
       type: String,
