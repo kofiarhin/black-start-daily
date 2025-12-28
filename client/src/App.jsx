@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { baseUrl } from "./constants/constants";
 import { useQuery } from "@tanstack/react-query";
 import NewsList from "./components/NewsList/NewsList";
+import Footer from "./components/Footer/Footer";
+import Header from "./components/Header/Header";
 
 const App = () => {
   const getNews = async () => {
@@ -23,8 +25,9 @@ const App = () => {
 
   return (
     <div>
-      <h1 className="heading center">Black star Daily</h1>
-      {data && <NewsList articles={data} />}
+      <Header />
+      <div>{data && <NewsList articles={data} />}</div>
+      <Footer />
     </div>
   );
 };
