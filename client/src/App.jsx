@@ -24,6 +24,8 @@ const App = () => {
     queryFn: getNews,
   });
 
+  console.log({ data });
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -31,7 +33,7 @@ const App = () => {
   return (
     <div>
       <Header />
-      <div>{data && <NewsList articles={data} />}</div>
+      <div>{data && <NewsList items={data} />}</div>
       <Footer />
     </div>
   );
