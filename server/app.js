@@ -20,8 +20,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/news", async (req, res, next) => {
-  const news = await News.find();
-  return res.json(news);
+  try {
+    const news = await News.find().sort({ timestamp: -1 }); // latest first
+    return res.json(news);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get("/api/health", (req, res) => {

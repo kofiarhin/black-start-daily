@@ -1,64 +1,16 @@
-// server/services/scraperService.js
-const { PlaywrightCrawler } = require("crawlee");
-const Article = require("../models/article.model");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const runScraper = async () => {
-  const crawler = new PlaywrightCrawler({
-    // Use headless mode to save resources on Render/Heroku
-    launchContext: {
-      launchOptions: { headless: true },
-    },
-    // Avoid memory leaks by limiting the crawl
-    maxRequestsPerCrawl: 20,
+const graphicCrawler = require("./server/services/graphic-crawler");
 
-    async requestHandler({ page, request, log }) {
-      log.info(`Scraping: ${request.url}`);
-
-      // Wait for the news container to ensure dynamic content is loaded
-      await page.waitForSelector(".most-recent-list, .article-item", {
-        timeout: 10000,
-      });
-
-      // Extract data in the browser context
-      const articles = await page.$$eval(
-        ".most-recent-list li, .article-item",
-        (elements, category) => {
-          return elements.map((el) => ({
-            title: el.querySelector("h2, h3")?.innerText.trim(),
-            link: el.querySelector("a")?.href,
-            imageUrl: el.querySelector("img")?.src,
-            category: category,
-            source: "MyJoyOnline",
-            createdAt: new Date(),
-          }));
-        },
-        request.userData.category
-      );
-
-      // Clean and save data
-      for (const article of articles) {
-        if (article.title && article.link) {
-          await Article.findOneAndUpdate(
-            { link: article.link }, // Unique identifier
-            article,
-            { upsert: true, new: true }
-          );
-        }
-      }
-    },
-  });
-
-  // Run for specific categories to populate your "5-Minute Read"
-  await crawler.run([
-    {
-      url: "https://www.myjoyonline.com/news/",
-      userData: { category: "Politics" },
-    },
-    {
-      url: "https://www.myjoyonline.com/business/",
-      userData: { category: "Business" },
-    },
-  ]);
-};
-
-module.exports = { runScraper };
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    await graphicCrawler(); // ✅ MUST await
+  } catch (err) {
+    console.log(err.message);
+  } finally {
+    await mongoose.connection.close(); // ✅ always close
+    process.exit(0);
+  }
+})();

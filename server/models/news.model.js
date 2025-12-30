@@ -1,12 +1,21 @@
+// server/models/news.model.js
 const mongoose = require("mongoose");
 
 const newsSchema = new mongoose.Schema(
   {
+    source: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: ["myjoyonline", "graphic", "citinews", "peacefmonline"], // add/remove as you like
+      index: true,
+    },
     url: {
       type: String,
       required: true,
-      unique: true,
+      unique: true, // keep this if urls will never clash across sources
       trim: true,
+      index: true,
     },
     title: {
       type: String,
@@ -24,13 +33,10 @@ const newsSchema = new mongoose.Schema(
     timestamp: {
       type: Date,
       default: Date.now,
+      index: true,
     },
   },
-  {
-    versionKey: false,
-  }
+  { versionKey: false }
 );
 
-const News = mongoose.model("News", newsSchema);
-
-module.exports = News;
+module.exports = mongoose.model("News", newsSchema);
