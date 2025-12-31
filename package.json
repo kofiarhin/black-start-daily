@@ -9,7 +9,8 @@
     "client": "npm run dev --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node server/server.js",
-    "start:playground": "nodemon playground.js"
+    "start:playground": "nodemon playground.js",
+    "start:crawler": "node server/crawlers/crawler.js"
   },
   "keywords": [],
   "author": "",
