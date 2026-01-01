@@ -28,11 +28,8 @@ const Footer = () => {
       <div className="site-footer__container">
         <div className="site-footer__top">
           <a className="site-footer__brand" href="/">
-            <span className="site-footer__mark" aria-hidden="true">
-              ★
-            </span>
             <div className="site-footer__brand-text">
-              <div className="site-footer__name">Black Star Daily</div>
+              <div className="site-footer__name">AgendaBoys</div>
               <div className="site-footer__sub">5-Minute Ghana Digest</div>
             </div>
           </a>
@@ -73,7 +70,7 @@ const Footer = () => {
 
         <div className="site-footer__bottom">
           <p className="site-footer__copyright">
-            © {year} Black Star Daily. All rights reserved.
+            © {year} AgendaBoys. All rights reserved.
           </p>
 
           <div className="site-footer__fine">
