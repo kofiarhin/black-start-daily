@@ -7,6 +7,7 @@ import Header from "../../components/Header/Header";
 import Spinner from "../../components/Spinner/Spinner";
 import NewsCarousel from "../../components/NewsCarousel/NewsCarousel";
 import LatestNews from "../../components/LatestNews/LatestNews";
+import MoreSection from "../../components/MoreSection/MoreSection";
 
 const Home = () => {
   const getNews = async () => {
@@ -36,9 +37,19 @@ const Home = () => {
     <>
       <Header />
       <div className="container">
-        {data && <NewsCarousel items={data} />}
-        <div>{data && <NewsList items={data} />}</div>
-        {data && <LatestNews items={data} />}
+        {/* {data && <NewsCarousel items={data} />} */}
+        {/* <div>{data && <NewsList items={data} />}</div> */}
+        {/* {data && <LatestNews items={data} />} */}
+        {/* {data && <MoreSection items={data} />} */}
+
+        {data && (
+          <>
+            <NewsList items={data} />
+            <NewsCarousel items={data} />
+            <LatestNews items={data} />
+            <MoreSection items={data} />
+          </>
+        )}
         <Footer />
       </div>
     </>
