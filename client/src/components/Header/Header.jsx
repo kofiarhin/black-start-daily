@@ -18,12 +18,8 @@ const Header = () => {
 
       <div className="site-header__container">
         <a className="site-header__brand" href="/">
-          <span className="site-header__mark" aria-hidden="true">
-            ★
-          </span>
-
           <div className="site-header__brand-text">
-            <h1 className="site-header__title">Black Star Daily</h1>
+            <h1 className="site-header__title">AgendaBoys</h1>
             <p className="site-header__tagline">5-Minute Ghana Digest</p>
           </div>
         </a>
@@ -31,11 +27,6 @@ const Header = () => {
         <nav className="site-header__nav" aria-label="Primary">
           <a className="site-header__link is-active" href="/">
             Home
-            <span className="site-header__link-glow" aria-hidden="true" />
-          </a>
-
-          <a className="site-header__link" href="/latest">
-            Latest
             <span className="site-header__link-glow" aria-hidden="true" />
           </a>
 
