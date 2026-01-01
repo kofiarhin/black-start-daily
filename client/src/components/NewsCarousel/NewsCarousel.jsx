@@ -49,13 +49,17 @@ const NewsCarousel = ({
   autoPlayMs = 5500,
   startIndex = 0,
   onOpen = () => {},
+  maxItems = 10, // ✅ render only 10 items at all times
 }) => {
   const reducedMotion = usePrefersReducedMotion();
 
   const slides = useMemo(() => {
     const arr = Array.isArray(items) ? items : [];
-    return arr.map(normalizeItem).filter((x) => x && x.title);
-  }, [items]);
+    return arr
+      .map(normalizeItem)
+      .filter((x) => x && x.title)
+      .slice(0, maxItems); // ✅ cap to 10
+  }, [items, maxItems]);
 
   const [index, setIndex] = useState(() =>
     clamp(startIndex, 0, Math.max(slides.length - 1, 0))
