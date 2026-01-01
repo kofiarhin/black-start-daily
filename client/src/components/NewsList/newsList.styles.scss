@@ -136,6 +136,99 @@
   color: rgba(255, 215, 0, 0.95);
 }
 
+.news-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 14px 0 18px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.news-pagination-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.news-pagination-count {
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  color: rgba(240, 240, 240, 0.7);
+  white-space: nowrap;
+}
+
+.news-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.news-pagination-btn {
+  height: 38px;
+  min-width: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(245, 245, 245, 0.92);
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 140ms ease, background 140ms ease, border 140ms ease,
+    opacity 140ms ease;
+}
+
+.news-pagination-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.news-pagination-btn:active {
+  transform: translateY(0);
+}
+
+.news-pagination-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 2px;
+}
+
+.news-pagination-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.news-pagination-page {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(240, 240, 240, 0.78);
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.news-pagination.is-bottom {
+  justify-content: center;
+  padding: 10px 0 0;
+  margin-top: 16px;
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+}
+
 .news-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -313,6 +406,20 @@
   .news-hero-title {
     font-size: 26px;
   }
+
+  .news-pagination {
+    padding: 12px 14px;
+  }
+
+  .news-pagination-btn {
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .news-pagination-page {
+    height: 40px;
+    font-size: 13px;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -343,7 +450,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .news-card,
-  .news-pill {
+  .news-pill,
+  .news-pagination-btn {
     transition: none;
   }
 

@@ -50,15 +50,18 @@ const NewsCarousel = ({
   startIndex = 0,
   onOpen = () => {},
   maxItems = 10, // ✅ render only 10 items at all times
+  pauseOnHover = false, // ✅ NEW: hover no longer kills autoplay by default
+  respectReducedMotion = true, // ✅ NEW: allow forcing autoplay even with reduced-motion
 }) => {
   const reducedMotion = usePrefersReducedMotion();
+  const shouldReduce = respectReducedMotion && reducedMotion;
 
   const slides = useMemo(() => {
     const arr = Array.isArray(items) ? items : [];
     return arr
       .map(normalizeItem)
       .filter((x) => x && x.title)
-      .slice(0, maxItems); // ✅ cap to 10
+      .slice(0, maxItems);
   }, [items, maxItems]);
 
   const [index, setIndex] = useState(() =>
@@ -98,16 +101,22 @@ const NewsCarousel = ({
     setIndex((i) => clamp(i, 0, total - 1));
   }, [total]);
 
+  // ✅ FIXED AUTOPLAY (clears interval reliably + doesn't get killed by hover unless enabled)
   useEffect(() => {
-    if (!autoPlay || reducedMotion || !total) return;
+    if (!autoPlay || shouldReduce || !total) return;
     if (isPaused || isDragging) return;
+
+    clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
       setIndex((i) => (i + 1) % total);
-    }, autoPlayMs);
+    }, Number(autoPlayMs) || 5500);
 
-    return () => clearInterval(intervalRef.current);
-  }, [autoPlay, autoPlayMs, isPaused, isDragging, reducedMotion, total]);
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
+  }, [autoPlay, autoPlayMs, isPaused, isDragging, shouldReduce, total]);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -186,8 +195,15 @@ const NewsCarousel = ({
     setIsPaused(false);
   };
 
-  const onMouseEnter = () => setIsPaused(true);
-  const onMouseLeave = () => setIsPaused(false);
+  const onMouseEnter = () => {
+    if (!pauseOnHover) return;
+    setIsPaused(true);
+  };
+
+  const onMouseLeave = () => {
+    if (!pauseOnHover) return;
+    setIsPaused(false);
+  };
 
   const openSlide = (s) => {
     if (!s?.url || s.url === "#") return;
@@ -197,6 +213,7 @@ const NewsCarousel = ({
 
   const translatePct = total ? -(index * 100) : 0;
   const dragPx = isDragging ? dragX : 0;
+
   const trackStyle = {
     transform: `translate3d(calc(${translatePct}% + ${dragPx}px), 0, 0)`,
   };
@@ -317,6 +334,7 @@ const NewsCarousel = ({
         >
           ‹
         </button>
+
         <button
           className="news-carousel-arrow right"
           type="button"

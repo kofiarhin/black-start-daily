@@ -15,9 +15,16 @@ const fmtDate = (ts) => {
   });
 };
 
-const NewsList = ({ items = [] }) => {
+const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+
+const NewsList = ({
+  items = [],
+  pageSize = 12, // ✅ items per page
+  maxSources = 6, // ✅ pills shown
+}) => {
   const [query, setQuery] = useState("");
   const [activeSource, setActiveSource] = useState("all");
+  const [page, setPage] = useState(1);
 
   const normalized = useMemo(() => {
     if (!Array.isArray(items)) return [];
@@ -42,13 +49,20 @@ const NewsList = ({ items = [] }) => {
     return normalized.filter((n) => {
       const matchesSource =
         activeSource === "all" ? true : n.source === activeSource;
+
       const matchesQuery = !q
         ? true
         : (n.title || "").toLowerCase().includes(q) ||
           (n.text || "").toLowerCase().includes(q);
+
       return matchesSource && matchesQuery;
     });
   }, [normalized, query, activeSource]);
+
+  // ✅ reset to page 1 whenever filters change
+  useEffect(() => {
+    setPage(1);
+  }, [query, activeSource, pageSize]);
 
   // subtle parallax glow follow
   useEffect(() => {
@@ -60,6 +74,21 @@ const NewsList = ({ items = [] }) => {
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = clamp(page, 1, totalPages);
+
+  const paged = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, safePage, pageSize]);
+
+  const from = totalItems ? (safePage - 1) * pageSize + 1 : 0;
+  const to = totalItems ? Math.min(safePage * pageSize, totalItems) : 0;
+
+  const goPrev = () => setPage((p) => clamp(p - 1, 1, totalPages));
+  const goNext = () => setPage((p) => clamp(p + 1, 1, totalPages));
 
   if (!normalized.length) return <div className="news-empty">No news yet.</div>;
 
@@ -97,7 +126,7 @@ const NewsList = ({ items = [] }) => {
           </div>
 
           <div className="news-filters" role="tablist" aria-label="Sources">
-            {sources.slice(0, 6).map((s) => (
+            {sources.slice(0, maxSources).map((s) => (
               <button
                 key={s || "all"}
                 className={`news-pill ${activeSource === s ? "is-active" : ""}`}
@@ -111,11 +140,76 @@ const NewsList = ({ items = [] }) => {
         </div>
       </div>
 
+      {/* ✅ Pagination bar (top) */}
+      <div
+        className="news-pagination"
+        role="navigation"
+        aria-label="Pagination"
+      >
+        <div className="news-pagination-meta">
+          {totalItems ? (
+            <span className="news-pagination-count">
+              Showing {from}–{to} of {totalItems}
+            </span>
+          ) : (
+            <span className="news-pagination-count">No results</span>
+          )}
+        </div>
+
+        <div className="news-pagination-controls">
+          <button
+            className="news-pagination-btn"
+            type="button"
+            onClick={() => setPage(1)}
+            disabled={safePage === 1}
+            aria-label="First page"
+          >
+            «
+          </button>
+
+          <button
+            className="news-pagination-btn"
+            type="button"
+            onClick={goPrev}
+            disabled={safePage === 1}
+            aria-label="Previous page"
+          >
+            ‹
+          </button>
+
+          <span className="news-pagination-page">
+            Page {safePage} / {totalPages}
+          </span>
+
+          <button
+            className="news-pagination-btn"
+            type="button"
+            onClick={goNext}
+            disabled={safePage === totalPages}
+            aria-label="Next page"
+          >
+            ›
+          </button>
+
+          <button
+            className="news-pagination-btn"
+            type="button"
+            onClick={() => setPage(totalPages)}
+            disabled={safePage === totalPages}
+            aria-label="Last page"
+          >
+            »
+          </button>
+        </div>
+      </div>
+
       <div className="news-grid">
-        {filtered.map((n, idx) => (
+        {paged.map((n, idx) => (
           <article
             key={n.id}
-            className={`news-card ${idx === 0 ? "is-featured" : ""}`}
+            className={`news-card ${
+              safePage === 1 && idx === 0 ? "is-featured" : ""
+            }`}
           >
             <a
               className="news-card-link"
@@ -169,6 +263,39 @@ const NewsList = ({ items = [] }) => {
       {!filtered.length ? (
         <div className="news-empty">
           No matches. Try a different search or switch source.
+        </div>
+      ) : null}
+
+      {/* ✅ Pagination bar (bottom) */}
+      {totalPages > 1 ? (
+        <div
+          className="news-pagination is-bottom"
+          role="navigation"
+          aria-label="Pagination"
+        >
+          <div className="news-pagination-controls">
+            <button
+              className="news-pagination-btn"
+              type="button"
+              onClick={goPrev}
+              disabled={safePage === 1}
+            >
+              Prev
+            </button>
+
+            <span className="news-pagination-page">
+              Page {safePage} / {totalPages}
+            </span>
+
+            <button
+              className="news-pagination-btn"
+              type="button"
+              onClick={goNext}
+              disabled={safePage === totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       ) : null}
     </section>
