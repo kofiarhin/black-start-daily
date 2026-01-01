@@ -13,54 +13,36 @@ const Header = () => {
   }, []);
 
   return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
-      <div className="site-header__fx" aria-hidden="true" />
+    <header className={`news-header ${scrolled ? "is-scrolled" : ""}`}>
+      <div className="news-main">
+        <div className="news-container news-main-inner">
+          <a className="news-brand" href="/">
+            <span className="news-brand-mark" aria-hidden="true">
+              AB
+            </span>
+            <span className="news-brand-text">
+              <span className="news-brand-title">AgendaBoys</span>
+              <span className="news-brand-sub">Lets shape the narrative</span>
+            </span>
+          </a>
 
-      <div className="site-header__container">
-        <a className="site-header__brand" href="/">
-          <div className="site-header__brand-text">
-            <h1 className="site-header__title">AgendaBoys</h1>
-            <p className="site-header__tagline">5-Minute Ghana Digest</p>
+          <nav className="news-nav" aria-label="Primary">
+            <a className="news-nav-link is-active" href="/" aria-current="page">
+              Home
+            </a>
+            <a className="news-nav-link" href="/latest">
+              Latest
+            </a>
+          </nav>
+
+          <div className="news-actions">
+            <a className="news-btn news-btn-primary" href="/latest">
+              Read now <span aria-hidden="true">↗</span>
+            </a>
+            <a className="news-btn news-btn-ghost" href="/login">
+              Login
+            </a>
           </div>
-        </a>
-
-        <nav className="site-header__nav" aria-label="Primary">
-          <a className="site-header__link is-active" href="/">
-            Home
-            <span className="site-header__link-glow" aria-hidden="true" />
-          </a>
-
-          <a className="site-header__cta" href="/latest">
-            Read now <span aria-hidden="true">↗</span>
-          </a>
-        </nav>
-      </div>
-
-      <div className="site-header__ticker" aria-hidden="true">
-        <div className="site-header__ticker-track">
-          <span>Breaking</span>
-          <span>•</span>
-          <span>Politics</span>
-          <span>•</span>
-          <span>Business</span>
-          <span>•</span>
-          <span>Sports</span>
-          <span>•</span>
-          <span>Culture</span>
-          <span>•</span>
-          <span>Tech</span>
-          <span>•</span>
-          <span>Breaking</span>
-          <span>•</span>
-          <span>Politics</span>
-          <span>•</span>
-          <span>Business</span>
-          <span>•</span>
-          <span>Sports</span>
-          <span>•</span>
-          <span>Culture</span>
-          <span>•</span>
-          <span>Tech</span>
         </div>
       </div>
     </header>
