@@ -44,8 +44,8 @@ const Home = () => {
 
         {data && (
           <>
-            <NewsList items={data} />
             <NewsCarousel items={data} />
+            <NewsList items={data} />
             <LatestNews items={data} />
             <MoreSection items={data} />
           </>

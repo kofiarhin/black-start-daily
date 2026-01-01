@@ -17,11 +17,7 @@ const fmtDate = (ts) => {
 
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
-const NewsList = ({
-  items = [],
-  pageSize = 12, // ✅ items per page
-  maxSources = 6, // ✅ pills shown
-}) => {
+const NewsList = ({ items = [], pageSize = 12, maxSources = 6 }) => {
   const [query, setQuery] = useState("");
   const [activeSource, setActiveSource] = useState("all");
   const [page, setPage] = useState(1);
