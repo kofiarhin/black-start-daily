@@ -1,65 +1,130 @@
-// server/crawlers/myjoy.crawler.js
+// server/crawlers/myjoyonlineCrawler.js
 const { PlaywrightCrawler } = require("crawlee");
 const News = require("../models/news.model");
 
-const myJoyOnline = async () => {
+const normalizeSpace = (s) => (s ? s.replace(/\s+/g, " ").trim() : "");
+
+const cleanArticleText = (s) => {
+  if (!s) return "";
+  return s
+    .replace(/googletag\.cmd\.push\(.*?\);/gs, "")
+    .replace(/\n\s*\n/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+};
+
+const getMyJoyImage = async (page) => {
+  const selector =
+    ".container.article-body .img-holder img.article-thumb, img.article-thumb";
+
+  try {
+    await page.waitForSelector(selector, { timeout: 15000 });
+
+    const url = await page.evaluate((sel) => {
+      const img = document.querySelector(sel);
+      if (!img) return null;
+
+      const src =
+        img.getAttribute("data-src") ||
+        img.getAttribute("data-lazy-src") ||
+        img.getAttribute("data-original") ||
+        img.currentSrc ||
+        img.getAttribute("src") ||
+        null;
+
+      if (!src) return null;
+      if (src.startsWith("//")) return `https:${src}`;
+      if (src.startsWith("/")) return `${location.origin}${src}`;
+      return src;
+    }, selector);
+
+    return url || null;
+  } catch {
+    return null;
+  }
+};
+
+const myjoyonlinecrawler = async () => {
   const crawler = new PlaywrightCrawler({
-    requestHandler: async ({ page, request, enqueueLinks }) => {
-      if (request.label === "DETAILS") {
-        const exists = await News.exists({ url: request.url });
-        if (exists) return;
+    launchContext: { launchOptions: { headless: true } },
 
-        await page.waitForSelector(".article-title h1");
-        await page.waitForSelector("#article-text p");
+    requestHandler: async ({ page, enqueueLinks, request, log }) => {
+      if (request.label === "DETAIL") {
+        log.info(`Scraping Article: ${request.url}`);
 
-        const title = (
-          await page.locator(".article-title h1").first().textContent()
-        )?.trim();
+        try {
+          await page.waitForSelector(".article-title", { timeout: 15000 });
 
-        const image =
-          (await page.locator(".img-holder img").first().getAttribute("src")) ||
-          (await page
-            .locator(".article-title img")
+          const rawTitle = await page
+            .locator(".article-title")
             .first()
-            .getAttribute("src")) ||
-          null;
+            .textContent();
+          const rawText = await page
+            .locator("#article-text")
+            .first()
+            .textContent();
 
-        const text = await page
-          .locator("#article-text p")
-          .allTextContents()
-          .then((arr) =>
-            arr
-              .map((t) => t.trim())
-              .filter(Boolean)
-              .join("\n\n")
-          );
+          const title = normalizeSpace(rawTitle);
+          const text = cleanArticleText(rawText);
+          const image = await getMyJoyImage(page);
 
-        if (!title || !text) return;
+          if (!title || !text) {
+            log.info(`⏭️ Skipped (missing content): ${request.url}`);
+            return;
+          }
 
-        await News.create({
-          source: "myjoyonline",
-          url: request.url,
-          title,
-          text,
-          image,
-          timestamp: new Date(),
-        });
+          const exists = await News.exists({ url: request.url });
+          if (exists) {
+            log.info(`⏭️ Skipped (exists): ${request.url}`);
+            return;
+          }
 
-        console.log("saved:", title);
+          await News.create({
+            source: "myjoyonline",
+            url: request.url,
+            title,
+            text,
+            image: image || null,
+            timestamp: new Date(),
+          });
+
+          log.info(`✅ Saved: ${title}`);
+        } catch (error) {
+          if (error && error.code === 11000) {
+            log.info(`⏭️ Skipped (exists): ${request.url}`);
+            return;
+          }
+          log.error(`❌ Failed to process ${request.url}: ${error.message}`);
+        }
+
         return;
       }
 
-      const newsItemElement = ".home-post-list-title a";
-      await page.waitForSelector(newsItemElement);
+      // LIST/HOME page: enqueue more links
+      try {
+        const enqueued = await enqueueLinks({
+          selector: ".home-post-list-title a",
+          label: "DETAIL",
+        });
 
-      await enqueueLinks({
-        selector: newsItemElement,
-        label: "DETAILS",
-      });
+        log.info(
+          `Enqueued ${enqueued.processedRequests.length} links from homepage`
+        );
+      } catch (error) {
+        log.error(`❌ Failed to enqueue links: ${error.message}`);
+      }
     },
+
+    navigationTimeoutSecs: 60,
+
+    // ✅ YOU HIT THIS LIMIT IN YOUR SCREENSHOT — BUMP IT
+    maxRequestsPerCrawl: 500,
+
+    // optional (helps throughput)
+    maxConcurrency: 5,
   });
 
-  await crawler.run([{ url: "https://www.myjoyonline.com/", label: "LIST" }]);
+  await crawler.run([{ url: "https://www.myjoyonline.com", label: "HOME" }]);
 };
 
-module.exports = myJoyOnline;
+module.exports = myjoyonlinecrawler;
