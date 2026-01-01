@@ -5,6 +5,7 @@ import NewsList from "./components/NewsList/NewsList";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
 import Spinner from "./components/Spinner/Spinner";
+import NewsCarousel from "./components/NewsCarousel/NewsCarousel";
 
 const App = () => {
   const getNews = async () => {
@@ -33,6 +34,7 @@ const App = () => {
   return (
     <div>
       <Header />
+      {data && <NewsCarousel items={data} />}
       <div>{data && <NewsList items={data} />}</div>
       <Footer />
     </div>
