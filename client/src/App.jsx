@@ -1,47 +1,16 @@
-import { useEffect } from "react";
-import { baseUrl } from "./constants/constants";
-import { useQuery } from "@tanstack/react-query";
-import NewsList from "./components/NewsList/NewsList";
-import Footer from "./components/Footer/Footer";
-import Header from "./components/Header/Header";
-import Spinner from "./components/Spinner/Spinner";
-import NewsCarousel from "./components/NewsCarousel/NewsCarousel";
-import LatestNews from "./components/LatestNews/LatestNews";
+import React from "react";
+import Home from "./Pages/Home/Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 const App = () => {
-  const getNews = async () => {
-    try {
-      const res = await fetch(`${baseUrl}/api/news`);
-      if (!res.ok) {
-        throw new Error("somethign went wrong");
-      }
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  const { data, isLoading } = useQuery({
-    queryKey: ["news"],
-    queryFn: getNews,
-  });
-
-  console.log({ data });
-
-  if (isLoading) {
-    return <Spinner />;
-  }
-
   return (
-    <>
-      <Header />
-      <div className="container">
-        {data && <NewsCarousel items={data} />}
-        <div>{data && <NewsList items={data} />}</div>
-        {data && <LatestNews items={data} />}
-        <Footer />
-      </div>
-    </>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </Router>
+    </div>
   );
 };
 
